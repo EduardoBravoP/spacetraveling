@@ -7,6 +7,7 @@ import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import { useState } from 'react';
 import { getPrismicClient } from '../services/prismic';
+import commonStyles from '../styles/common.module.scss';
 
 import styles from './home.module.scss';
 import Header from '../components/Header';
@@ -34,13 +35,16 @@ export default function Home({ postsPagination }: HomeProps) {
   const [isMorePost, setIsMorePost] = useState(
     postsPagination.next_page !== null
   );
+  const [nextPage, setNextPage] = useState(postsPagination.next_page);
   const [posts, setPosts] = useState<Post[]>(postsPagination.results);
 
   async function handleFetchMorePosts() {
-    const response = await fetch(postsPagination.next_page);
-    const { results } = await response.json();
+    const response = await fetch(nextPage);
+    const { results, next_page } = await response.json();
 
-    setIsMorePost(!!results.next_page);
+    console.log(next_page);
+
+    setIsMorePost(next_page !== null);
 
     const newPosts = results.map((post: Post) => {
       return {
@@ -55,6 +59,7 @@ export default function Home({ postsPagination }: HomeProps) {
     });
 
     setPosts([...posts, ...newPosts]);
+    setNextPage(next_page);
   }
 
   return (
@@ -63,7 +68,7 @@ export default function Home({ postsPagination }: HomeProps) {
         <title>spacetraveling | Home</title>
       </Head>
 
-      <div className={styles.container}>
+      <div className={commonStyles.container}>
         <Header />
 
         {posts.map(post => (
@@ -72,19 +77,19 @@ export default function Home({ postsPagination }: HomeProps) {
               {post.data.title}
             </a>
             <p className={styles.subtitle}>{post.data.subtitle}</p>
-            <div className={styles.infoContainer}>
-              <div className={styles.infoGroup}>
+            <div className={commonStyles.infoContainer}>
+              <div className={commonStyles.infoGroup}>
                 <FiCalendar size={20} />
-                <p className={styles.info}>
+                <p className={commonStyles.info}>
                   {format(new Date(post.first_publication_date), 'PP', {
                     locale: ptBR,
                   })}
                 </p>
               </div>
 
-              <div className={styles.infoGroup}>
+              <div className={commonStyles.infoGroup}>
                 <FiUser size={20} />
-                <p className={styles.info}>{post.data.author}</p>
+                <p className={commonStyles.info}>{post.data.author}</p>
               </div>
             </div>
           </article>
@@ -108,7 +113,7 @@ export const getStaticProps: GetStaticProps = async () => {
   const prismic = getPrismicClient();
   const postsResponse = await prismic.query(
     Prismic.predicates.at('document.type', 'posts'),
-    { pageSize: 1, fetch: ['posts.title', 'posts.subtitle', 'posts.author'] }
+    { pageSize: 10, fetch: ['posts.title', 'posts.subtitle', 'posts.author'] }
   );
 
   const posts = postsResponse.results.map(post => {
