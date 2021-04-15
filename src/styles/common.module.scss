@@ -1,3 +1,31 @@
-svg {
+.container {
+  width: 100%;
+  max-width: 700px;
+  margin: 0 auto;
+  padding-bottom: 80px;
+}
+
+.infoContainer {
+  display: flex;
+}
+
+.infoGroup {
+  display: flex;
+
+  & + .infoGroup {
+    margin-left: 24px;
+    display: flex;
+    align-items: center;
+  }
+
+  & svg {
+    margin-right: 8px;
+  }
+}
+
+
+.info {
   color: #BBBBBB;
+  font-weight: 400;
+  font-size: 14px;
 }
