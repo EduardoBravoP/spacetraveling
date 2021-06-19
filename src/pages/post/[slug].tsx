@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 import { format } from 'date-fns';
 import ptBR from 'date-fns/locale/pt-BR';
 import Prismic from '@prismicio/client';
@@ -40,6 +41,7 @@ export default function Post({ post }: PostProps) {
     total += contentItem.heading.split(' ').length;
 
     const words = contentItem.body.map(item => item.text.split(' ').length);
+    // eslint-disable-next-line no-return-assign
     words.map(word => (total += word));
 
     return total;
@@ -102,7 +104,7 @@ export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
   const postsResponse = await prismic.query(
     Prismic.predicates.at('document.type', 'posts'),
-    { pageSize: 10, fetch: [] }
+    { pageSize: 5 }
   );
 
   return {
